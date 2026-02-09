@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>题目数据统计</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        .chart-grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            width: 2000px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        .chart-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .chart-title {
+            text-align: center;
+            padding: 15px 0;
+            margin: 0;
+            font-size: 22px;
+            background-color: #2c3e50;
+            color: white;
+            border-radius: 8px;
+        }
+        .chart-container {
+            width: 100%;
+            height: 600px;
+        }
+        @media (max-width: 1300px) {
+            .chart-grid-container {
+                grid-template-columns: 1fr;
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chart-grid-container">
+        <!-- 标签等级分布直方图 -->
+        <div class="chart-card">
+            <h3 class="chart-title">标签等级分布</h3>
+            <div id="tag-level-chart" class="chart-container"></div>
+        </div>
+
+        <!-- 难度等级分布直方图 -->
+        <div class="chart-card">
+            <h3 class="chart-title">难度等级分布</h3>
+            <div id="difficult-level-chart" class="chart-container"></div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟数据（实际使用时替换为Django传递的image_data）
+        {#var image_data = {#}
+        {#    'tag_level': [5, 12, 8, 15, 10, 7, 9],#}
+        {#    'tag_list': ['动态规划', '贪心算法', '图论', '数学', '字符串', '树', '搜索'],#}
+        {#    'difficult_level': [20, 35, 25, 15, 5],#}
+        {#    'difficult_list': ['简单', '中等', '较难', '困难', '极难']#}
+        {#};#}
+        var tag_level = {{ tag_level|safe }};
+        var tag_list = {{ tag_list|safe }};
+        var difficult_level = {{ difficult_level|safe }};
+        var difficult_list = {{ difficult_list|safe }};
+        // 创建柱状图配置函数
+        function createBarChartOption(title, xData, yData, color) {
+            return {
+                title: {
+                    text: title,
+                    left: 'center',
+                    textStyle: {
+                        fontSize: 16,
+                        fontWeight: 'bold'
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    },
+                    formatter: '{b}: {c}题'
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: xData,
+                    axisLabel: {
+                        interval: 0,
+                        rotate: xData.length > 7 ? 30 : 0,
+                        fontSize: 12
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '题目数量',
+                    nameLocation: 'middle',
+                    nameGap: 30
+                },
+                series: [{
+                    name: '数量',
+                    type: 'bar',
+                    data: yData,
+                    itemStyle: {
+                        color: color
+                    },
+                    label: {
+                        show: true,
+                        position: 'top'
+                    },
+                    barWidth: '60%'
+                }]
+            };
+        }
+
+        // 初始化图表
+        var tagChart = echarts.init(document.getElementById('tag-level-chart'));
+        var difficultChart = echarts.init(document.getElementById('difficult-level-chart'));
+
+        // 设置图表选项
+        var tagOption = createBarChartOption(
+            '标签等级分布',
+            tag_list,
+            tag_level,
+            '#5470C6'
+        );
+
+        var difficultOption = createBarChartOption(
+            '难度等级分布',
+            difficult_list,
+            difficult_level,
+            '#91CC75'
+        );
+
+        // 渲染图表
+        tagChart.setOption(tagOption);
+        difficultChart.setOption(difficultOption);
+
+        // 响应式调整
+        window.addEventListener('resize', function() {
+            tagChart.resize();
+            difficultChart.resize();
+        });
+    </script>
+</body>
+</html>

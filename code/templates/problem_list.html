@@ -1,0 +1,166 @@
+
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<body>
+  <div class="layui-fluid">
+    <div class="layui-card">
+      <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+          <input type="hidden" id="rating_min" autocomplete="off" class="layui-input" value="">
+          <input type="hidden" id="rating_max" autocomplete="off" class="layui-input" value="">
+          <input type="hidden" id="tag" autocomplete="off" class="layui-input" value="">
+        <div class="layui-form-item">
+          <div class="layui-inline">
+            <label class="layui-form-label">Rating区间</label>
+            <div class="layui-input-inline" style="width: 100px;">
+                <input type="text" name="rating_min" id="rating_min_1" autocomplete="off" class="layui-input" value="">
+          </div>
+          <div class="layui-form-mid">-</div>
+          <div class="layui-input-inline" style="width: 100px;">
+            <input type="text" name="rating_max" id="rating_max_1" autocomplete="off" class="layui-input" value="">
+          </div>
+          </div>
+          <div class="layui-inline">
+            <label class="layui-form-label">算法标签</label>
+            <div class="layui-input-inline">
+              <select name="tag" id="tag_1">
+                <option value="">请选择</option>
+                <option value="*special">*special</option>
+                <option value="2-sat">2-sat</option>
+                <option value="binary search">binary search</option>
+                <option value="bitmasks">bitmasks</option>
+                <option value="brute force">brute force</option>
+                <option value="chinese remainder theorem">chinese remainder theorem</option>
+                <option value="combinatorics">combinatorics</option>
+                <option value="constructive algorithms">constructive algorithms</option>
+                <option value="data structures">data structures</option>
+                <option value="dfs and similar">dfs and similar</option>
+                <option value="divide and conquer">divide and conquer</option>
+                <option value="dp">dp</option>
+                <option value="dsu">dsu</option>
+                <option value="expression parsing">expression parsing</option>
+                <option value="fft">fft</option>
+                <option value="flows">flows</option>
+                <option value="games">games</option>
+                <option value="geometry">geometry</option>
+                <option value="graph matchings">graph matchings</option>
+                <option value="graphs">graphs</option>
+                <option value="greedy">greedy</option>
+                <option value="hashing">hashing</option>
+                <option value="implementation">implementation</option>
+                <option value="interactive">interactive</option>
+                <option value="math">math</option>
+                <option value="matrices">matrices</option>
+                <option value="meet-in-the-middle">meet-in-the-middle</option>
+                <option value="number theory">number theory</option>
+                <option value="probabilities">probabilities</option>
+                <option value="schedules">schedules</option>
+                <option value="shortest paths">shortest paths</option>
+                <option value="sortings">sortings</option>
+                <option value="string suffix structures">string suffix structures</option>
+                <option value="strings">strings</option>
+                <option value="ternary search">ternary search</option>
+                <option value="trees">trees</option>
+                <option value="two pointers">two pointers</option>
+              </select>
+            </div>
+          </div>
+          <div class="layui-inline">
+            <button class="layui-btn layuiadmin-btn-list" lay-submit lay-filter="LAY-app-forumlist-search">
+              <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+            </button>
+          </div>
+          <div class="layui-inline">
+              <button class="layui-btn layui-btn-normal" id="start_spider" lay-submit lay-filter="start_spider" style="margin-left: 10px;" >
+                爬取数据
+              </button>
+        </div>
+        </div>
+      </div>
+      <div class="layui-card-body">
+          <table id="LAY-app-forum-list" lay-filter="LAY-app-forum-list"></table>
+          {% verbatim %}
+            <script type="text/html" id="table-forum-list">
+               {{# if(d.send_key == 0){ }}
+              <a class="layui-btn layui-btn-sm layui-btn-sm" lay-event="send"><i class="layui-icon layui-icon-add-circle-fine"></i>提交</a>
+               {{#  } else { }}
+              <a class="layui-btn layui-btn-sm layui-btn-normal" lay-event="send_1">已 提 交</a>
+               {{#  } }}
+            </script>
+          {% endverbatim %}
+      </div>
+    </div>
+  </div>
+  </body>
+{% endblock %}
+
+{% block js %}
+  <script>
+  layui.config({
+    base: '{% static "layuiadmin/" %}' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index', 'forum', 'table'], function() {
+      var $ = layui.$
+          , form = layui.form
+          , table = layui.table;
+
+      //监听搜索   捕获到表单提交的事件，然后执行其中的回调函数。在回调函数中，通过 table.reload 方法来重新加载表格数据
+      form.on('submit(LAY-app-forumlist-search)', function (data) {
+          var field = data.field;
+          console.log(notNumber(field.rating_min))
+          console.log(field.rating_min == "")
+          if(field.rating_min != ""){
+              if(notNumber(field.rating_min)){
+                  console.log(field.rating_min)
+              layer.msg("rating区间应为数字！");
+              return false
+              }
+          }
+          if(field.rating_max != ""){
+              if(notNumber(field.rating_max)){
+                  console.log(field.rating_max)
+              layer.msg("rating区间应为数字！");
+              return false
+              }
+          }
+          //执行重载
+          table.reload('LAY-app-forum-list', {
+              page:{curr:1},
+              where: field   // 发送到后端的数据
+          });
+      });
+      form.on('submit(start_spider)', function (data) {
+          var field = data.field;
+          console.log(field)
+
+          document.getElementById("start_spider").innerHTML = '正在爬取请稍后...';     //设置按钮文字  用户点击按钮后就会立即看到按钮文字的变化
+          document.getElementById("start_spider").removeAttribute('lay-filter');  //移除lay-filter属性 以防止用户再次点击按钮时触发表单提交事件
+
+          $.ajax({
+               type: 'POST',
+               url: '/start_spider/',
+               data:field,
+               success: function (res) {
+                   layer.msg(res.msg);
+                   document.getElementById("start_spider").innerHTML = '开始爬取';
+                   document.getElementById("start_spider").setAttribute("lay-filter", "start_spider")
+               },
+               error:function(response){
+                   layer.msg(response.msg);
+               }
+           })
+
+        });
+  });
+  function notNumber(val) {  //判断是否为数字
+    var regPos = /^\d+(\.\d+)?$/; //非负浮点数
+    var regNeg = /^(-(([0-9]+\.[0-9]*[1-9][0-9]*)|([0-9]*[1-9][0-9]*\.[0-9]+)|([0-9]*[1-9][0-9]*)))$/; //负浮点数
+    if(regPos.test(val) || regNeg.test(val)) {
+        return false;
+        } else {
+        return true;
+        }
+    }
+  </script>
+{% endblock %}

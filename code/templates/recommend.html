@@ -1,0 +1,66 @@
+
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<body>
+<div class="layui-fluid layadmin-maillist-fluid">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-elem-quote" style="background-color: white">用户Rating:{{rating}}</div>
+      {% for problem in recommend_list %}
+        <div class="layui-col-md4 layui-col-sm6">
+      <div class="layadmin-contact-box" style="min-height: 250px;">
+          <div class="layui-col-md9 layui-col-sm6">
+            <a href="javascript:;">
+              <div class="layadmin-text">
+                <h3 class="layadmin-title"><strong>题目名称：{{ problem.Title }}</strong></h3>
+                <h3 class="layadmin-title">ID：{{ problem.ID }}</h3>
+                <h3 class="layadmin-title">Tags：{{ problem.Tags }}</h3>
+                <h3 class="layadmin-title">Rating：{{ problem.Rating }}</h3>
+                <h3 class="layadmin-title">Solved：{{ problem.Solved}}</h3>
+              </div>
+            </a>
+          </div>
+{#          <div class="layui-col-md2 layui-col-sm6">#}
+{#             <button class="layui-btn" onclick="send({{ problem.ID }},'{{ problem.Title }}')">提交</button>#}
+{#          </div>#}
+      </div>
+    </div>
+      {% endfor %}
+  </div>
+</div>
+
+
+</body>
+{% endblock %}
+{% block js %}
+  <script>
+  layui.config({
+    base: '{% static "layuiadmin/" %}' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index', 'jquery','layer','element']);
+
+  function send(problem_id, problem_name) {
+      var $ = layui.$,
+	    layer = layui.layer,
+	    element = layui.element;
+
+          console.log(problem_id)
+        layer.confirm("确定提交"+problem_name +"吗？", function(t) {
+			$.ajax({
+				   type: 'POST',
+				   data:{"problem_id":problem_id, "send_key":0},
+				   url: '/send_problem/',
+				   success: function (res) {
+					   layer.msg(res.msg);location.reload()
+				   },
+				   error:function(response){
+					   layer.msg(response.msg);
+				   }
+			   }),
+				layer.close(t)
+		})
+      }
+
+  </script>
+{% endblock js %}

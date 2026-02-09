@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<body>
+  <div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+      <!-- 信息量和爬取次数的父容器 -->
+      <div class="layui-col-sm2 layui-col-md2 layui-col-lg6">
+        <div class="layui-card" style="height: 300px;">
+          <div class="layui-card-header">
+            信息量与爬取次数
+          </div>
+          <div class="layui-card-body layuiadmin-card-list" style="display: flex; flex-direction: column; height: 100%;">
+            <!-- 信息量 -->
+            <div style="flex: 1;text-align: center;">
+              <p class="layuiadmin-big-font">{{ all_problem }}条</p>
+              <p>总题目数量</p>
+            </div>
+            <!-- 爬取次数 -->
+            <div style="flex: 1;text-align: center;">
+              <p class="layuiadmin-big-font">{{ spider_info.count }}次</p>
+              <p>
+                总计爬取{{ spider_info.count }}次
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 系统监控 -->
+      <div class="layui-col-sm6 layui-col-md2 layui-col-lg6">
+        <div class="layui-card" style="height: 300px;">
+          <div class="layui-card-header">
+            系统监控
+          </div>
+          <div class="layui-card-body">
+            <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-control">
+              <div carousel-item id="LAY-index-control">
+                <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i>正在加载...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="layui-row layui-col-space15">
+      <div class="layui-col-md12">
+        <div class="layui-row layui-col-space15">
+          <div class="layui-col-md12">
+            <div class="layui-card">
+              <div class="layui-card-header">数据概览</div>
+              <div class="layui-card-body">
+                <div class="layui-carousel layadmin-carousel layadmin-dataview" data-anim="fade" lay-filter="LAY-index-dataview">
+                  <div carousel-item id="LAY-index-dataview">
+                    <div><i class="layui-icon layui-icon-loading1 layadmin-loading"></i></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 可选的其他信息卡片，左边数据卡片 -->
+  </div>
+</body>
+{% endblock %}
+{% block js %}
+<script>
+      layui.config({
+        base: '{% static "layuiadmin/" %}' //静态资源所在路径
+      }).extend({
+        index: 'lib/index' //主入口模块
+      }).use(['index', 'console']);
+</script>
+{% endblock %}

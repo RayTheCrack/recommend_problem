@@ -1,0 +1,27 @@
+【项目配置与运行】
+1、配置本地Python环境 （选择自己的python编译器，建议创建一个虚拟环境）
+2、安装依赖库，在终端窗口（Teminal）输入命令：
+pip install -r requirements.txt -i https://pypi.mirrors.ustc.edu.cn/simple/
+3、启动项目，在终端窗口输入命令：
+python manage.py runserver
+4、浏览器打开网站：
+http://127.0.0.1:8000/
+5、查看环境
+conda info --envs
+source activate myenv
+6、数据库迁移
+python manage.py makemigrations 自动生成数据库迁移脚本
+python manage.py migrate 执行数据迁移
+账号 1   密码 1
+账号 2   密码 2
+后台账号admins   密码admins
+【系统运行环境】
+1、系统配置
+CPU	Apple M4 with 4.41GHz
+操作系统	MacOS Sequoia 15.3
+内存容量	16GB
+硬盘容量	512G
+2、开发环境
+pycharm 专业版
+conda 25.3.1
+Server version: 9.2.0 MySQL Community Server

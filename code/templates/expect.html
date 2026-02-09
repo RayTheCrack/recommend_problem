@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<body>
+  <div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+      <div class="layui-col-md12">
+        <div class="layui-card">
+          <div class="layui-card-header">期望题目标签</div>
+          <div class="layui-card-body">
+            <div class="layui-form" lay-filter="">
+              <div class="layui-form-item">
+                <label class="layui-form-label">标签选择</label>
+                <div class="layui-input-block">
+                  <select name="tag" lay-verify="">
+                      {% if place == '' %}
+                    <option value="">请选择期望的题目标签</option>
+                      {% else %}
+                    <option value="{{ place }}" class="layui-this">{{ place }}</option>
+                      {% endif %}
+                    <option value="None">None</option>
+                    <option value="*special">*special</option>
+                    <option value="2-sat">2-sat</option>
+                    <option value="binary search">binary search</option>
+                    <option value="bitmasks">bitmasks</option>
+                    <option value="brute force">brute force</option>
+                    <option value="chinese remainder theorem">chinese remainder theorem</option>
+                    <option value="combinatorics">combinatorics</option>
+                    <option value="constructive algorithms">constructive algorithms</option>
+                    <option value="data structures">data structures</option>
+                    <option value="dfs and similar">dfs and similar</option>
+                    <option value="divide and conquer">divide and conquer</option>
+                    <option value="dp">dp</option>
+                    <option value="dsu">dsu</option>
+                    <option value="expression parsing">expression parsing</option>
+                    <option value="fft">fft</option>
+                    <option value="flows">flows</option>
+                    <option value="games">games</option>
+                    <option value="geometry">geometry</option>
+                    <option value="graph matchings">graph matchings</option>
+                    <option value="graphs">graphs</option>
+                    <option value="greedy">greedy</option>
+                    <option value="hashing">hashing</option>
+                    <option value="implementation">implementation</option>
+                    <option value="interactive">interactive</option>
+                    <option value="math">math</option>
+                    <option value="matrices">matrices</option>
+                    <option value="meet-in-the-middle">meet-in-the-middle</option>
+                    <option value="number theory">number theory</option>
+                    <option value="probabilities">probabilities</option>
+                    <option value="schedules">schedules</option>
+                    <option value="shortest paths">shortest paths</option>
+                    <option value="sortings">sortings</option>
+                    <option value="string suffix structures">string suffix structures</option>
+                    <option value="strings">strings</option>
+                    <option value="ternary search">ternary search</option>
+                    <option value="trees">trees</option>
+                    <option value="two pointers">two pointers</option>
+                  </select>
+                </div>
+              </div>
+              <div class="layui-form-item">
+                <div class="layui-input-block">
+                   <button class="layui-btn" lay-submit lay-filter="expect" id="expect">确认选择</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+{% endblock %}
+
+{% block js %}
+  <script>
+  layui.config({
+    base: '{% static "layuiadmin/" %}' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index', 'form'], function() {
+      var $ = layui.$,
+          layer= layui.layer
+          , form = layui.form;
+
+      form.on('submit(expect)', function (data) {
+          var post_data = data.field;
+          console.log(post_data)
+
+          $.ajax({
+               type: 'POST',
+               url: '/problem_expect/',
+               data:post_data,
+               success: function (res) {
+                   layer.msg(res.msg);
+               },
+               error:function(response){
+                   layer.msg(response.msg);
+               }
+           })
+
+        });
+  });
+  </script>
+{% endblock %}

@@ -1,0 +1,10 @@
+python==3.9.21
+numpy==2.0.2
+django==4.2.20
+requests==2.32.3
+pymysql==1.1.1
+psutil==7.0.0
+urllib3==1.26.20
+pyecharts
+
+
