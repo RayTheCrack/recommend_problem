@@ -1,0 +1,38 @@
+# 开发环境 Dockerfile
+FROM python:3.10-slim
+
+LABEL maintainer="Gazy0906@outlook.com"
+
+WORKDIR /app
+
+# 安装系统依赖
+RUN apt update && apt install -y \
+    default-mysql-client \
+    wget \
+    unzip \
+    libglib2.0-0 \
+    libnss3 \
+    libgconf-2-4 \
+    libfontconfig1 \
+    vim \
+    && rm -rf /var/lib/apt/lists/*
+
+# 设置时区
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# 复制依赖文件
+COPY code/requirements.txt /app/
+
+# 安装Python依赖
+RUN pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple \
+    && pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+# 复制项目代码
+COPY code/ /app/
+
+# 暴露端口
+EXPOSE 8000
+
+# 开发环境：使用Django开发服务器
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

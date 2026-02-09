@@ -6,4 +6,7 @@ psutil==7.0.0
 urllib3==1.26.20
 pyecharts
 
-
+# 生产环境依赖
+gunicorn==21.2.0
+python-dotenv==1.0.0
+whitenoise==6.6.0  # 静态文件服务

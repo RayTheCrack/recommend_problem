@@ -22,15 +22,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
-# 项目的密钥
-SECRET_KEY = 'django-insecure-o1v2#%cj30hv45yl0+)b#(qh$$290y5i4y3=w2(-@c*9#cj)_s'
+# 项目的密钥 - 支持环境变量配置
+SECRET_KEY = os.getenv(
+    'SECRET_KEY',
+    'django-insecure-o1v2#%cj30hv45yl0+)b#(qh$$290y5i4y3=w2(-@c*9#cj)_s'
+)
 
-# 是否调试模式
-DEBUG = True
+# 是否调试模式 - 支持环境变量配置
+DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 'yes')
 
-# 被允许的域名或ip
-ALLOWED_HOSTS = []
-# ALLOWED_HOSTS = ['*'] # 允许局域网内所有的域名或ip访问
+# 被允许的域名或ip - 支持环境变量配置
+ALLOWED_HOSTS_STR = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1')
+ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_STR.split(',')]
 
 
 # Application definition
@@ -87,17 +90,20 @@ WSGI_APPLICATION = 'problemRecommend.wsgi.application'  # wsgi应用程序
 #     }
 # }
 
+# 支持环境变量配置的数据库设置
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',  # 引擎不能错
-        'NAME': 'recommend_problem',  # 数据库名（必须提前创建，且和你的SQL文件库名一致）
-        'USER': 'root',  # 数据库用户名（默认root，根据实际修改）
-        'PASSWORD': 'password',  # 无密码则留空，但生产环境不建议
-        'HOST': '127.0.0.1',  # 本地数据库填127.0.0.1，远程填IP
-        'PORT': '3306',  # MySQL默认端口，不要改（除非你手动改了）
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv('MYSQL_DATABASE', 'recommend_problem'),
+        'USER': os.getenv('MYSQL_USER', 'root'),
+        'PASSWORD': os.getenv('MYSQL_PASSWORD', 'password'),
+        'HOST': os.getenv('MYSQL_HOST', '127.0.0.1'),
+        'PORT': os.getenv('MYSQL_PORT', '3306'),
         'OPTIONS': {
-            'charset': 'utf8mb4',  # 避免中文乱码
-        }
+            'charset': 'utf8mb4',
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
+        'CONN_MAX_AGE': 600,  # 连接池
     }
 }
 

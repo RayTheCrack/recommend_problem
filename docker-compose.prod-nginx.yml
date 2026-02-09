@@ -1,4 +1,26 @@
 services:
+  # Nginx 反向代理
+  nginx:
+    image: nginx:latest
+    container_name: recommend_problem_nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./code/static:/app/staticfiles:ro
+      - ./code/logs/nginx:/var/log/nginx
+    depends_on:
+      - web
+    networks:
+      - recommend_network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   # Django应用服务（生产环境）
   web:
     build:
@@ -6,8 +28,6 @@ services:
       dockerfile: Dockerfile
     container_name: recommend_problem_web
     restart: always
-    ports:
-      - "8000:8000"
     volumes:
       - ./code/static:/app/staticfiles
       - ./code/logs:/app/logs
@@ -27,6 +47,8 @@ services:
         condition: service_healthy
     networks:
       - recommend_network
+    expose:
+      - "8000"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/"]
       interval: 30s
@@ -44,8 +66,6 @@ services:
     image: mysql:8.0
     container_name: recommend_problem_mysql
     restart: always
-    ports:
-      - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./recommend_problem.sql:/docker-entrypoint-initdb.d/recommend_problem.sql
@@ -69,12 +89,12 @@ services:
         max-size: "10m"
         max-file: "3"
     command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    expose:
+      - "3306"
 
-# 数据卷（持久化MySQL数据，避免丢失）
 volumes:
   mysql_data:
 
-# 自定义网络（确保Django和MySQL容器互通）
 networks:
   recommend_network:
     driver: bridge
