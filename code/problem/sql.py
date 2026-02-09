@@ -7,8 +7,8 @@ def fetch_codeforces_data(user):
     connection = pymysql.connect(
         host="localhost",      # 数据库主机
         user="root",           # 用户名
-        password="lihaokun5419",   # 密码（替换为你的实际密码）
-        database="lhk",  # 数据库名称
+        password="password",   # 密码（替换为你的实际密码）
+        database="recommend_problem",  # 数据库名称
         cursorclass=pymysql.cursors.DictCursor
     )
     print(user)

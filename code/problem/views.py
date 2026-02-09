@@ -398,7 +398,10 @@ def radar(request):
                     ac_num['其他'] += data["ac_count"]
                 sub_num['其他'] += data["submission_count"]
     for key, value in ac_per.items():
-        ac_per[key] = ac_num[key]/sub_num[key]*100
+        if sub_num[key] != 0:
+            ac_per[key] = ac_num[key]/sub_num[key]*100
+        else:
+            ac_per[key] = 0
     image_data={
         'acc':acc,
         'ac_per':ac_per

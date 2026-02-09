@@ -89,12 +89,15 @@ WSGI_APPLICATION = 'problemRecommend.wsgi.application'  # wsgi应用程序
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': "lhk",  # 数据名
-        "USER": "root",  # 用户名
-        "PASSWORD": "lihaokun5419", # mysql密码
-        "HOST": "localhost",  # 域名
-        "PORT": "3306", # 端口
+        'ENGINE': 'django.db.backends.mysql',  # 引擎不能错
+        'NAME': 'recommend_problem',  # 数据库名（必须提前创建，且和你的SQL文件库名一致）
+        'USER': 'root',  # 数据库用户名（默认root，根据实际修改）
+        'PASSWORD': 'password',  # 无密码则留空，但生产环境不建议
+        'HOST': '127.0.0.1',  # 本地数据库填127.0.0.1，远程填IP
+        'PORT': '3306',  # MySQL默认端口，不要改（除非你手动改了）
+        'OPTIONS': {
+            'charset': 'utf8mb4',  # 避免中文乱码
+        }
     }
 }
 
