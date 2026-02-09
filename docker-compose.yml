@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # Django应用服务
+  web:
+    build: .  # 基于当前目录的Dockerfile构建镜像
+    container_name: recommend_problem_web
+    restart: always  # 容器异常退出自动重启
+    ports:
+      - "8000:8000"  # 宿主机8000端口映射到容器8000（若端口被占用可修改左侧）
+    volumes:
+      # 挂载静态文件目录（宿主机和容器同步）
+      - ./code/static:/app/static
+      # 挂载爬虫驱动目录（若有ChromeDriver需确保路径正确，无则可注释）
+      - ./code/chromedriver:/app/chromedriver
+    environment:
+      # Django核心配置（已替换为你的信息）
+      - DEBUG=False  # 生产环境建议保持False，开发时可改为True
+      - DATABASE_URL=mysql://root:password@db:3306/recommend_problem?charset=utf8mb4
+      - SECRET_KEY=django-insecure-o1v2#%cj30hv45yl0+)b#(qh$$290y5i4y3=w2(-@c*9#cj)_s
+      - ALLOWED_HOSTS=localhost,127.0.0.1,192.168.182.128
+    depends_on:
+      - db  # 先启动MySQL容器，再启动Django容器
+    networks:
+      - recommend_network
+
+  # MySQL数据库服务
+  db:
+    image: mysql:8.0  # MySQL8.0镜像（兼容Django4.2）
+    container_name: recommend_problem_mysql
+    restart: always
+    ports:
+      - "3306:3306"  # 宿主机3306端口映射到容器3306（外部可访问）
+    volumes:
+      # 持久化MySQL数据（容器删除后数据不丢失）
+      - mysql_data:/var/lib/mysql
+      # 挂载数据库初始化脚本（容器启动时自动执行）
+      - ./recommend_problem.sql:/docker-entrypoint-initdb.d/recommend_problem.sql
+    environment:
+      # MySQL配置（已替换为你的密码）
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=recommend_problem  # 自动创建项目数据库
+      - MYSQL_CHARACTER_SET_SERVER=utf8mb4
+      - MYSQL_COLLATION_SERVER=utf8mb4_unicode_ci
+    networks:
+      - recommend_network
+
+# 数据卷（持久化MySQL数据，避免丢失）
+volumes:
+  mysql_data:
+
+# 自定义网络（确保Django和MySQL容器互通）
+networks:
+  recommend_network:
+    driver: bridge
