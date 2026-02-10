@@ -1,80 +1,55 @@
-services:
-  # Django应用服务（生产环境）
-  web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: recommend_problem_web
-    restart: always
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./code/static:/app/staticfiles
-      - ./code/logs:/app/logs
-      - ./code/chromedriver:/app/chromedriver
-    environment:
-      - DEBUG=False
-      - DATABASE_URL=mysql://root:password@db:3306/recommend_problem?charset=utf8mb4
-      - SECRET_KEY=django-insecure-o1v2#%cj30hv45yl0+)b#(qh$$290y5i4y3=w2(-@c*9#cj)_s
-      - ALLOWED_HOSTS=localhost,127.0.0.1,192.168.182.128
-      - MYSQL_HOST=db
-      - MYSQL_PORT=3306
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=password
-      - MYSQL_DATABASE=recommend_problem
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - recommend_network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+version: '3.8'
 
-  # MySQL数据库服务
+services:
+  # MySQL 数据库服务
   db:
     image: mysql:8.0
-    container_name: recommend_problem_mysql
-    restart: always
+    container_name: recommend_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: recommend_problem
+      MYSQL_USER: django
+      MYSQL_PASSWORD: django123
+      TZ: 'Asia/Shanghai'
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./recommend_problem.sql:/docker-entrypoint-initdb.d/recommend_problem.sql
-    environment:
-      - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_DATABASE=recommend_problem
-      - MYSQL_CHARACTER_SET_SERVER=utf8mb4
-      - MYSQL_COLLATION_SERVER=utf8mb4_unicode_ci
-      - TZ=Asia/Shanghai
-    networks:
-      - recommend_network
+      - ./recommend_problem.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      - recommend_network
 
-# 数据卷（持久化MySQL数据，避免丢失）
+  # Django 应用服务
+  app:
+    build: .
+    container_name: recommend_app
+    command: sh -c "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 --workers 3 --timeout 120 problemRecommend.wsgi:application"
+    environment:
+      MYSQL_HOST: db
+      MYSQL_USER: django
+      MYSQL_PASSWORD: django123
+      MYSQL_DATABASE: recommend_problem
+      MYSQL_PORT: 3306
+      DEBUG: 'False'
+      ALLOWED_HOSTS: 'localhost,127.0.0.1,*'
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./code:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - recommend_network
+
 volumes:
   mysql_data:
 
-# 自定义网络（确保Django和MySQL容器互通）
 networks:
   recommend_network:
     driver: bridge
