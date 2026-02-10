@@ -1,15 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import os
 import pymysql
+
+
 # 连接 MySQL 数据库
 def fetch_codeforces_data(user):
-    """从 MySQL 数据库中读取 Codeforces 题目数据"""
+    """从 MySQL 数据库中读取 Codeforces 题目数据
+
+    使用环境变量优先（与容器运行时的 `MYSQL_*` 保持一致），
+    回退到合理默认值以便本地开发。
+    """
+    host = os.getenv('MYSQL_HOST', '127.0.0.1')
+    port = int(os.getenv('MYSQL_PORT', '3306'))
+    db_user = os.getenv('MYSQL_USER', 'root')
+    db_password = os.getenv('MYSQL_PASSWORD', 'password')
+    database = os.getenv('MYSQL_DATABASE', 'recommend_problem')
+
     connection = pymysql.connect(
-        host="localhost",      # 数据库主机
-        user="root",           # 用户名
-        password="password",   # 密码（替换为你的实际密码）
-        database="recommend_problem",  # 数据库名称
-        cursorclass=pymysql.cursors.DictCursor
+        host=host,
+        port=port,
+        user=db_user,
+        password=db_password,
+        database=database,
+        cursorclass=pymysql.cursors.DictCursor,
+        charset='utf8mb4'
     )
     print(user)
     codeforces = {}  # 存储数据

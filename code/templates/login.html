@@ -14,7 +14,7 @@
 </head>
 <body>
 
-  <div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: none;">
+  <div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: block;">
 
     <div class="layadmin-user-login-main">
       <div class="layadmin-user-login-box layadmin-user-login-header">
@@ -73,7 +73,7 @@
                    // 弹窗内容， 样式
                    if (res.code == 0) { // 登入成功
                         layer.msg(res.msg, {icon:1,time:1000});  // 弹窗 提示
-                        setTimeout(function (){location.href="http://127.0.0.1:8000/index/";}, 1000) // 延迟重定向
+                        setTimeout(function (){location.href="/index/";}, 1000) // 延迟重定向（使用相对路径）
                         }
                    else {
                             layer.msg(res.msg);

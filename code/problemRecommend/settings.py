@@ -51,6 +51,7 @@ INSTALLED_APPS = [  # 安装的应用程序
 
 MIDDLEWARE = [  # 中间件
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     # 'django.middleware.csrf.CsrfViewMiddleware',
@@ -144,12 +145,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # 静态文件资源访问接口固定配置
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static")
     ]
+
+# Enable WhiteNoise static file serving when DEBUG is False
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

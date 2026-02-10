@@ -5,6 +5,7 @@ pymysql==1.1.1
 psutil==7.0.0
 urllib3==1.26.20
 pyecharts
+cryptography>=41.0.0  # MySQL auth support
 
 # 生产环境依赖
 gunicorn==21.2.0

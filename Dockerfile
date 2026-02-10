@@ -1,5 +1,5 @@
-# 使用官方 Python 运行时作为基础镜像
-FROM python:3.11-slim
+# 使用阿里云私有镜像作为基础镜像
+FROM crpi-1h9mgsiii387rvos.cn-qingdao.personal.cr.aliyuncs.com/recoj/python:3.12.12-trixie
 
 # 设置环境变量
 ENV PYTHONUNBUFFERED=1 \
@@ -24,8 +24,8 @@ RUN pip install -r requirements.txt
 # 复制项目文件
 COPY code/ .
 
-# 收集静态文件
-RUN python manage.py collectstatic --noinput --clear
+# 创建 staticfiles 目录并收集静态文件
+RUN mkdir -p /app/staticfiles && python manage.py collectstatic --noinput --clear
 
 # 暴露端口
 EXPOSE 8000
