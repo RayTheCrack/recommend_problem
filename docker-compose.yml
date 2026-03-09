@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # MySQL 数据库服务
+  recommend_db:
+    image: crpi-1h9mgsiii387rvos.cn-qingdao.personal.cr.aliyuncs.com/recoj/mysql:8.0
+    container_name: recommend_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: recommend_problem
+      MYSQL_USER: django
+      MYSQL_PASSWORD: django123
+    ports:
+      - "3307:3306" # 将容器的 3306 端口映射到主机的 3307 端口，防止端口冲突
+    volumes:
+      - recommend_mysql_data:/var/lib/mysql
+      - ./recommend_problem.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - recommend_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Django 应用服务
+  recommend_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: rec_oj:latest
+    container_name: recommend_app
+    depends_on:
+      recommend_db:
+        condition: service_healthy
+    environment:
+      MYSQL_HOST: recommend_db
+      MYSQL_USER: django
+      MYSQL_PASSWORD: django123
+      MYSQL_DATABASE: recommend_problem
+      MYSQL_PORT: 3306
+      DEBUG: "False"
+      ALLOWED_HOSTS: "localhost,127.0.0.1,*"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./code:/app
+    networks:
+      - recommend_network
+    command: bash -c "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 --workers 3 --timeout 120 problemRecommend.wsgi:application"
+
+volumes:
+  recommend_mysql_data:
+
+networks:
+  recommend_network:

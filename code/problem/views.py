@@ -270,6 +270,22 @@ def get_recommend(request):
         recommend_list, rating = problem_recomm.recommend_by_user_cf(request.session.get("user_id"))
     return render(request, "recommend.html", locals())
 
+def api_recommend(request):
+    user_id = request.session.get('user_id') 
+    if models.UserList.objects.count() <= 5:
+        recommend_list, rating = problem_recommend.recommend_by_item_id(user_id)
+    else:
+        recommend_list, rating = problem_recomm.recommend_by_user_cf(user_id)
+    # 构建返回的JSON数据，包含用户ID、推荐列表、评分和使用的算法类型
+    response_data = {
+        "user_id": user_id,
+        "recommendations": recommend_list,
+        "ratings": rating,
+        "algorithm": "item-based" if models.UserList.objects.count() <= 5 else "CF-based"
+    }
+    # 返回JSON格式的响应数据
+    return JsonResponse(response_data)
+    
 
 def send_page(request):
     return render(request, "send_list.html")

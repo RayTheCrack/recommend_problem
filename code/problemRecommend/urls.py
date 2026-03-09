@@ -9,6 +9,7 @@ urlpatterns = [
     # kwargs: 视图使用的字典类型的参数。
     # name: 为 URL 路由指定一个唯一的名称，以便在代码的其他地方引用它。这对于在模板中生成 URL 或在代码中进行重定向等操作非常有用
     path('admin/', admin.site.urls),  # 管理员
+    path('api/recommend/', views.api_recommend, name='api_recommend'), # 获取推荐信息的接口
     re_path('^$', views.login),  # 默认访问登录页面  # re_path('^$', views.login) 与 path('', views.login) 效果一样
     path('login/', views.login, name="login"),  # 登入 # name
     path('register/', views.register, name="register"),  # 注册
