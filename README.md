@@ -85,23 +85,23 @@ networks:
 cd /path/to/recommend_problem
 
 # 启动所有服务
-docker-compose up -d
+docker compose up -d
 
 # 查看服务状态
-docker-compose ps
+docker compose ps
 
 # 查看日志
-docker-compose logs -f recommend_app
-docker-compose logs -f recommend_db
+docker compose logs -f recommend_app
+docker compose logs -f recommend_db
 ```
 
 #### 3. 停止服务
 
 ```bash
-docker-compose down
+docker compose down
 
 # 同时删除数据卷
-docker-compose down -v
+docker compose down -v
 ```
 
 ---
